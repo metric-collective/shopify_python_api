@@ -6,6 +6,8 @@ try:
 except ImportError:
     import json
 import re
+
+from google.appengine.api import urlfetch
 from contextlib import contextmanager
 from six.moves import urllib
 import six
@@ -59,14 +61,16 @@ class Session(object):
 
         url = "%s/oauth/access_token?" % self.site
         query_params = dict(client_id=self.api_key, client_secret=self.secret, code=code)
-        request = urllib.request.Request(url, urllib.parse.urlencode(query_params).encode('utf-8'))
-        response = urllib.request.urlopen(request)
-
-        if response.code == 200:
-            self.token = json.loads(response.read().decode('utf-8'))['access_token']
+        url = url + urllib.parse.urlencode(query_params).encode('utf-8')
+        response = urlfetch.fetch(url, method="POST")
+        
+        # request = urllib.request.Request(url, urllib.parse.urlencode(query_params).encode('utf-8'))
+        # response = urllib.request.urlopen(request)
+        if response.status_code == 200:
+            self.token = json.loads(response.content)['access_token']
             return self.token
         else:
-            raise Exception(response.msg)
+            raise Exception(response.content)
 
     @property
     def site(self):
