@@ -62,7 +62,7 @@ class Session(object):
         url = "%s/oauth/access_token?" % self.site
         query_params = dict(client_id=self.api_key, client_secret=self.secret, code=code)
         url = url + urllib.parse.urlencode(query_params).encode('utf-8')
-        response = urlfetch.fetch(url, method="POST")
+        response = urlfetch.fetch(url, method="POST", deadline=60)
         
         # request = urllib.request.Request(url, urllib.parse.urlencode(query_params).encode('utf-8'))
         # response = urllib.request.urlopen(request)
